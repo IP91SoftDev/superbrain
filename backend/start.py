@@ -1275,7 +1275,7 @@ def launch_backend_status():
         token = TOKEN_FILE.read_text(encoding="utf-8").strip()
 
     url = "NOT_FOUND"
-    log_file = BACKEND_DIR / "config" / "localtunnel.log"
+    log_file = BASE_DIR / "config" / "localtunnel.log"
     if log_file.exists():
         match = re.search(r"your url is: (https://[^\s]+)", log_file.read_text(encoding="utf-8"))
         if match:
