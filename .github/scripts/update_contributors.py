@@ -9,7 +9,6 @@ req = urllib.request.Request(URL, headers={"User-Agent": "Mozilla/5.0"})
 with urllib.request.urlopen(req) as response:
     contributors = json.loads(response.read().decode())
 
-# Add specific bots/agents manually:
 contributors.append({
     "login": "cursoragent",
     "html_url": "https://github.com/cursoragent",
@@ -25,14 +24,14 @@ html_parts = []
 for c in contributors:
     login = c.get('login')
     html_url = c.get('html_url')
-    # Use s=48 for small square resolution
+    # Request high-dps size
     avatar_url = c.get('avatar_url', '')
     if '?' in avatar_url:
-        avatar_url += "&s=48"
+        avatar_url += "&s=400"
     else:
-        avatar_url += "?size=48"
+        avatar_url += "?size=400"
 
-    # rounded corner style
+    # Rounded square styling (High-res source mapped to 48x48 element)
     tag = f'<a href="{html_url}"><img src="{avatar_url}" width="48" height="48" alt="{login}" style="border-radius: 8px;"></a>'
     html_parts.append(tag)
 
