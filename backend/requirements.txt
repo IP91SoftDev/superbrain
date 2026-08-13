@@ -40,3 +40,4 @@ pyngrok>=7.1.5
 # ── Terminal UI ───────────────────────────────────────────────────────────────
 rich>=13.0.0
 segno>=1.6.0
+# test comment for CI trigger verification
