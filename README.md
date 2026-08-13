@@ -647,6 +647,4 @@ Thanks to all community members and AI agents for improving SuperBrain:
 
 ## Star History
 
-<p align="center">
-  <img alt="Star History Chart" src="star_history.svg" />
-</p>
+[![Star History Chart](https://api.star-history.com/chart?repos=sidinsearch/superbrain&type=date&legend=top-left&sealed_token=FTgdSp1tS9R55Xrq7L6P4_EsJZWODIWNm9_dsPLRlgI4ssCMAXqWE-Sr8k9Uoax7fQ4hjAa_TCF0yJ9Ffh_5YPCGF-FYB3nasj88Rf3JunGpxsV6qDPhAA)](https://www.star-history.com/?repos=sidinsearch%2Fsuperbrain&type=date&legend=top-left)
