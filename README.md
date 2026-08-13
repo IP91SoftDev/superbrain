@@ -19,7 +19,7 @@ A self-hosted AI-powered second brain for Android — save Instagram posts, YouT
       src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1127472&theme=light"
       height="40"
     />
-  </a> <a href="https://github.com/cursoragent"><img src="https://github.com/cursoragent.png?size=48" width="48" height="48" alt="Cursor Agent" title="Cursor Agent"></a> <a href="https://github.com/apps/copilot-swe-agent"><img src="https://avatars.githubusercontent.com/in/1143301?v=4&s=48" width="48" height="48" alt="GitHub Copilot" title="GitHub Copilot"></a>
+  </a>
 </p>
 
 [![Download APK](https://img.shields.io/badge/Download%20APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/sidinsearch/superbrain/releases/latest/download/superbrain.apk)
@@ -628,20 +628,22 @@ This project is licensed under the **[GNU Affero General Public License v3.0](LI
 ---
 
 <p align="center">
-  Made with ❤️ by <a href="https://github.com/sidinsearch">sidinsearch</a> <a href="https://github.com/cursoragent"><img src="https://github.com/cursoragent.png?size=48" width="48" height="48" alt="Cursor Agent" title="Cursor Agent"></a> <a href="https://github.com/apps/copilot-swe-agent"><img src="https://avatars.githubusercontent.com/in/1143301?v=4&s=48" width="48" height="48" alt="GitHub Copilot" title="GitHub Copilot"></a>
+  Made with ❤️ by <a href="https://github.com/sidinsearch">sidinsearch</a>
   &nbsp;·&nbsp;
-  Copyright &copy; 2026 <a href="https://github.com/sidinsearch">sidinsearch</a> <a href="https://github.com/cursoragent"><img src="https://github.com/cursoragent.png?size=48" width="48" height="48" alt="Cursor Agent" title="Cursor Agent"></a> <a href="https://github.com/apps/copilot-swe-agent"><img src="https://avatars.githubusercontent.com/in/1143301?v=4&s=48" width="48" height="48" alt="GitHub Copilot" title="GitHub Copilot"></a>
+  Copyright &copy; 2026 <a href="https://github.com/sidinsearch">sidinsearch</a>
   &nbsp;·&nbsp;
-  <a href="LICENSE">AGPL-3.0 License</a> <a href="https://github.com/cursoragent"><img src="https://github.com/cursoragent.png?size=48" width="48" height="48" alt="Cursor Agent" title="Cursor Agent"></a> <a href="https://github.com/apps/copilot-swe-agent"><img src="https://avatars.githubusercontent.com/in/1143301?v=4&s=48" width="48" height="48" alt="GitHub Copilot" title="GitHub Copilot"></a>
+  <a href="LICENSE">AGPL-3.0 License</a>
 </p>
 
 
 
 ## Contributors
 
-Thank you to the following community members for improving SuperBrain:
+Thanks to all community members and AI agents for improving SuperBrain:
 
-<a href="https://github.com/djbclark"><img src="https://github.com/djbclark.png?size=48" width="48" height="48" alt="djbclark" title="djbclark"></a> <a href="https://github.com/TheBoomerDev"><img src="https://github.com/TheBoomerDev.png?size=48" width="48" height="48" alt="TheBoomerDev" title="TheBoomerDev"></a> <a href="https://github.com/cursoragent"><img src="https://github.com/cursoragent.png?size=48" width="48" height="48" alt="Cursor Agent" title="Cursor Agent"></a> <a href="https://github.com/apps/copilot-swe-agent"><img src="https://avatars.githubusercontent.com/in/1143301?v=4&s=48" width="48" height="48" alt="GitHub Copilot" title="GitHub Copilot"></a>
+<!-- contributors:start -->
+<a href="https://github.com/sidinsearch"><img src="https://avatars.githubusercontent.com/u/29821792?v=4&s=48" width="48" height="48" alt="sidinsearch" style="border-radius: 8px;"></a> <a href="https://github.com/djbclark"><img src="https://avatars.githubusercontent.com/u/131936?v=4&s=48" width="48" height="48" alt="djbclark" style="border-radius: 8px;"></a> <a href="https://github.com/TheBoomerDev"><img src="https://avatars.githubusercontent.com/u/87417633?v=4&s=48" width="48" height="48" alt="TheBoomerDev" style="border-radius: 8px;"></a> <a href="https://github.com/cursoragent"><img src="https://github.com/cursoragent.png?size=48" width="48" height="48" alt="cursoragent" style="border-radius: 8px;"></a> <a href="https://github.com/apps/copilot-swe-agent"><img src="https://avatars.githubusercontent.com/in/1143301?v=4&s=48" width="48" height="48" alt="copilot-swe-agent" style="border-radius: 8px;"></a>
+<!-- contributors:end -->
 
 ## Star History
 
