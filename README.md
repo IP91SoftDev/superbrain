@@ -647,10 +647,6 @@ Thanks to all community members and AI agents for improving SuperBrain:
 
 ## Star History
 
-<a href="https://star-history.com/#sidinsearch/superbrain&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=sidinsearch/superbrain&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=sidinsearch/superbrain&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=sidinsearch/superbrain&type=Date" />
-  </picture>
-</a>
+<p align="center">
+  <img alt="Star History Chart" src="star_history.svg" />
+</p>
