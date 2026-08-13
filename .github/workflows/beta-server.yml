@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: beta-server-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-backend:
     name: Backend Tests

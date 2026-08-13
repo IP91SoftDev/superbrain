@@ -15,6 +15,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: beta-apk-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-apk:
     name: Build Beta APK
@@ -63,6 +67,11 @@ jobs:
           BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
           TASK="assemble$(echo ${BUILD_TYPE^})"
           cd superbrain-app/android && ./gradlew $TASK --no-daemon --stacktrace
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEYSTORE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_KEY_ALIAS: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
 
       - name: Locate and rename APK
         run: |
