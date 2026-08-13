@@ -72,3 +72,9 @@ superbrain-cli/node_modules/
 superbrain-cli/payload/
 
 
+.gbrain-source
+
+# Android release signing — never commit keystores
+*.keystore
+*.jks
+superbrain-app/android/release.keystore

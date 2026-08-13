@@ -1,56 +1,35 @@
-name: Build and Attach APK to Release
+name: Release APK
 
 on:
   push:
-    tags:
-      - 'v*'
-  release:
-    types:
-      - published
+    branches: [main]
+    paths:
+      - 'superbrain-app/**'
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Release tag to publish (for example v1.0.2-beta.1)'
-        required: true
 
 permissions:
   contents: write
 
-jobs:
-  release-apk:
-    runs-on: ubuntu-latest
+concurrency:
+  group: release-apk-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  build-apk:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Resolve release tag
-        id: vars
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG_NAME="${{ github.event.inputs.tag }}"
-          elif [ "${{ github.event_name }}" = "release" ]; then
-            TAG_NAME="${{ github.event.release.tag_name }}"
-          else
-            TAG_NAME="${GITHUB_REF_NAME}"
-          fi
-
-          if [[ "$TAG_NAME" != v* ]]; then
-            echo "Tag must start with v (received: $TAG_NAME)"
-            exit 1
-          fi
-
-          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
-
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
 
@@ -80,30 +59,49 @@ jobs:
 
       - name: Build release APK
         run: cd superbrain-app/android && ./gradlew assembleRelease --no-daemon --stacktrace
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEYSTORE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_KEY_ALIAS: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
 
-      - name: Collect APK
-        shell: bash
+      - name: Locate and rename APK
         run: |
           APK_PATH=$(find superbrain-app/android/app/build/outputs/apk/release -name "*.apk" | head -1)
-          if [ -z "$APK_PATH" ]; then
-            echo "Release APK not found"
-            exit 1
-          fi
+          echo "APK found at: $APK_PATH"
           cp "$APK_PATH" superbrain.apk
 
-      - name: Upload release APK artifact
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: superbrain-release-${{ github.run_number }}
           path: superbrain.apk
           retention-days: 30
 
+      - name: Resolve release metadata
+        id: meta
+        shell: bash
+        run: |
+          VERSION_BASE=$(node -e "const v=require('./superbrain-cli/package.json').version; console.log(v.split('-')[0]);")
+          echo "version=$VERSION_BASE" >> "$GITHUB_OUTPUT"
+          echo "release_tag=v${VERSION_BASE}" >> "$GITHUB_OUTPUT"
+
       - name: Create or update GitHub Release with APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.vars.outputs.tag_name }}
-          name: SuperBrain ${{ steps.vars.outputs.tag_name }}
-          prerelease: ${{ contains(steps.vars.outputs.tag_name, '-beta') }}
+          tag_name: ${{ steps.meta.outputs.release_tag }}
+          name: "SuperBrain v${{ steps.meta.outputs.version }}"
+          body: |
+            ## SuperBrain v${{ steps.meta.outputs.version }}
+
+            - Branch: `main`
+            - Build: ${{ github.run_number }}
+            - Commit: ${{ github.sha }}
+
+            ### Downloads
+            - Android APK: `superbrain.apk` (attached below)
+          prerelease: false
+          make_latest: true
           generate_release_notes: true
           overwrite_files: true
           files: superbrain.apk

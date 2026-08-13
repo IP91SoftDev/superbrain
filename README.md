@@ -636,3 +636,9 @@ This project is licensed under the **[GNU Affero General Public License v3.0](LI
 </p>
 
 
+
+## Contributors
+
+Thank you to the following community members for improving SuperBrain:
+
+<a href="https://github.com/djbclark"><img src="https://github.com/djbclark.png?size=48" width="48" height="48" alt="djbclark" title="djbclark"></a> <a href="https://github.com/TheBoomerDev"><img src="https://github.com/TheBoomerDev.png?size=48" width="48" height="48" alt="TheBoomerDev" title="TheBoomerDev"></a>
