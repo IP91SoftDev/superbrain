@@ -1,6 +1,6 @@
 {
   "name": "superbrain-server",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "1-Line Auto-Installer and Server Execution wrapper for SuperBrain",
   "bin": {
     "superbrain-server": "bin/superbrain.js"

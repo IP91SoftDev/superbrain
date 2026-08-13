@@ -125,8 +125,10 @@ jobs:
       - name: Configure npm auth for GitHub Packages
         shell: bash
         run: |
-          echo "${{ steps.vars.outputs.owner_scope }}:registry=https://npm.pkg.github.com" > ~/.npmrc
-          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
+          NPMRC="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          echo "${{ steps.vars.outputs.owner_scope }}:registry=https://npm.pkg.github.com" > "$NPMRC"
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> "$NPMRC"
+          echo "always-auth=true" >> "$NPMRC"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
