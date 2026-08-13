@@ -1,0 +1,98 @@
+name: Release APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'superbrain-app/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Install JS dependencies
+        run: |
+          npm cache clean --force
+          npm ci || npm install
+        working-directory: superbrain-app
+
+      - name: Set Android SDK local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > superbrain-app/android/local.properties
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.npm
+          key: gradle-npm-${{ hashFiles('superbrain-app/package-lock.json', 'superbrain-app/android/**/*.gradle*', 'superbrain-app/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-npm-
+            gradle-
+
+      - name: Make gradlew executable
+        run: chmod +x superbrain-app/android/gradlew
+
+      - name: Build release APK
+        run: cd superbrain-app/android && ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Locate and rename APK
+        run: |
+          APK_PATH=$(find superbrain-app/android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          echo "APK found at: $APK_PATH"
+          cp "$APK_PATH" superbrain.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: superbrain-release-${{ github.run_number }}
+          path: superbrain.apk
+          retention-days: 30
+
+      - name: Resolve release metadata
+        id: meta
+        shell: bash
+        run: |
+          VERSION_BASE=$(node -e "const v=require('./superbrain-cli/package.json').version; console.log(v.split('-')[0]);")
+          echo "version=$VERSION_BASE" >> "$GITHUB_OUTPUT"
+          echo "release_tag=v${VERSION_BASE}" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.release_tag }}
+          name: "SuperBrain v${{ steps.meta.outputs.version }}"
+          body: |
+            ## SuperBrain v${{ steps.meta.outputs.version }}
+
+            - Branch: `main`
+            - Build: ${{ github.run_number }}
+            - Commit: ${{ github.sha }}
+
+            ### Downloads
+            - Android APK: `superbrain.apk` (attached below)
+          prerelease: false
+          make_latest: true
+          generate_release_notes: true
+          overwrite_files: true
+          files: superbrain.apk

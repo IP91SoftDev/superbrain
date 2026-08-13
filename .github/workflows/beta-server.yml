@@ -1,0 +1,75 @@
+name: Beta Server Tests
+
+on:
+  push:
+    branches: [beta]
+    paths:
+      - 'backend/**'
+      - 'superbrain-cli/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt pytest pytest-asyncio httpx
+        working-directory: backend
+
+      - name: Start API server
+        run: |
+          nohup python api.py > /tmp/superbrain-api.log 2>&1 &
+          echo "API server starting (PID $!)..."
+        working-directory: backend
+
+      - name: Wait for API to be ready
+        run: |
+          for i in $(seq 1 30); do
+            TOKEN=$(cat token.txt 2>/dev/null | tr -d '[:space:]')
+            if [ -n "$TOKEN" ]; then
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "X-API-Key: $TOKEN" http://localhost:5000/recent?limit=1 2>/dev/null || true)
+              if [ "$STATUS" = "200" ]; then
+                echo "API ready (HTTP $STATUS) after ${i}s"
+                exit 0
+              fi
+            fi
+            sleep 1
+          done
+          echo "API did not become ready. Server log:"
+          cat /tmp/superbrain-api.log
+          exit 1
+        working-directory: backend
+
+      - name: Run backend tests
+        run: python -m pytest tests/ -v --disable-warnings
+        working-directory: backend
+
+  build-server-package:
+    name: Build Server Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Build server payload
+        run: node scripts/build.js
+        working-directory: superbrain-cli

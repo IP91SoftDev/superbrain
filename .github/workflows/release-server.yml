@@ -1,16 +1,9 @@
-name: Release (Main)
+name: Release Server Package
 
 on:
   push:
     branches: [main]
     paths:
-      - 'superbrain-app/**'
-      - 'backend/**'
-      - 'superbrain-cli/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'superbrain-app/**'
       - 'backend/**'
       - 'superbrain-cli/**'
   workflow_dispatch:
@@ -66,102 +59,9 @@ jobs:
         run: python -m pytest tests/ -v --disable-warnings
         working-directory: backend
 
-  build-apk:
-    name: Build & Release APK
-    needs: test-backend
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: 20
-
-      - name: Install JS dependencies
-        run: |
-          npm cache clean --force
-          npm ci || npm install
-        working-directory: superbrain-app
-
-      - name: Set Android SDK local.properties
-        run: echo "sdk.dir=$ANDROID_HOME" > superbrain-app/android/local.properties
-
-      - name: Cache Gradle packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.npm
-          key: gradle-npm-${{ hashFiles('superbrain-app/package-lock.json', 'superbrain-app/android/**/*.gradle*', 'superbrain-app/android/gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-npm-
-            gradle-
-
-      - name: Make gradlew executable
-        run: chmod +x superbrain-app/android/gradlew
-
-      - name: Build release APK
-        run: cd superbrain-app/android && ./gradlew assembleRelease --no-daemon --stacktrace
-
-      - name: Locate and rename APK
-        run: |
-          APK_PATH=$(find superbrain-app/android/app/build/outputs/apk/release -name "*.apk" | head -1)
-          echo "APK found at: $APK_PATH"
-          cp "$APK_PATH" superbrain.apk
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: superbrain-release-${{ github.run_number }}
-          path: superbrain.apk
-          retention-days: 30
-
-      - name: Resolve release metadata
-        id: meta
-        shell: bash
-        run: |
-          VERSION_BASE=$(node -e "const v=require('./superbrain-cli/package.json').version; console.log(v.split('-')[0]);")
-          echo "version=$VERSION_BASE" >> "$GITHUB_OUTPUT"
-          echo "release_tag=v${VERSION_BASE}" >> "$GITHUB_OUTPUT"
-
-      - name: Create or update GitHub Release with APK
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.meta.outputs.release_tag }}
-          name: "SuperBrain v${{ steps.meta.outputs.version }}"
-          body: |
-            ## SuperBrain v${{ steps.meta.outputs.version }}
-
-            - Branch: `main`
-            - Build: ${{ github.run_number }}
-            - Commit: ${{ github.sha }}
-
-            ### Downloads
-            - Android APK: `superbrain.apk` (attached below)
-
-            ### npm packages published
-            - `superbrain-server@${{ steps.meta.outputs.version }}` on [npmjs.com](https://www.npmjs.com/package/superbrain-server)
-            - `@sidinsearch/superbrain-server@${{ steps.meta.outputs.version }}` on [GitHub Packages](https://github.com/sidinsearch/superbrain/pkgs/npm/superbrain-server)
-          prerelease: false
-          make_latest: true
-          generate_release_notes: true
-          overwrite_files: true
-          files: superbrain.apk
-
   publish-server:
     name: Publish Server Package (npmjs + GitHub Packages)
     needs: test-backend
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -182,10 +82,6 @@ jobs:
         shell: bash
         run: |
           VERSION_BASE=$(node -e "const v=require('./superbrain-cli/package.json').version; console.log(v.split('-')[0]);")
-          if [[ "$VERSION_BASE" == *"-beta"* || "$VERSION_BASE" == *"-beta."* ]]; then
-            echo "Stable release must not have a -beta version (got $VERSION_BASE). Bump superbrain-cli/package.json to the next stable version and merge again."
-            exit 1
-          fi
           echo "version=$VERSION_BASE" >> "$GITHUB_OUTPUT"
           echo "owner_scope=@${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
           echo "repo_url=https://github.com/${GITHUB_REPOSITORY}.git" >> "$GITHUB_OUTPUT"
@@ -200,7 +96,7 @@ jobs:
           fi
           echo "Version ${{ steps.vars.outputs.version }} is new — proceeding."
 
-      - name: Set version metadata
+      - name: Set npmjs metadata
         shell: bash
         run: |
           cd superbrain-cli
