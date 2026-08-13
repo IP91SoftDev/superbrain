@@ -69,7 +69,7 @@ jobs:
   build-apk:
     name: Build & Release APK
     needs: test-backend
-    if: github.event_name == 'push'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -161,7 +161,7 @@ jobs:
   publish-server:
     name: Publish Server Package (npmjs + GitHub Packages)
     needs: test-backend
-    if: github.event_name == 'push'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
