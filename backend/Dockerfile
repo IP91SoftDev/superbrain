@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 
 # Build dependencies in separate layer
-RUN pip install --user --no-cache-dir -r requirements.txt
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 
 
 # ────────────────────────────────────────────────────────────────────────────────
@@ -40,11 +40,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ──── Copy Python dependencies from builder ────
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /install /usr/local
 
 # ──── Set environment variables ────
-ENV PATH=/root/.local/bin:$PATH \
-    PYTHONUNBUFFERED=1 \
+ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     ENVIRONMENT=production \
     WORKERS=2
@@ -58,7 +57,7 @@ RUN mkdir -p temp config static logs data && \
 
 # ──── Health check ────
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+    CMD curl -f http://localhost:5000/ping || exit 1
 
 # ──── Run as non-root user for security ────
 RUN useradd -m -u 1000 appuser && \
