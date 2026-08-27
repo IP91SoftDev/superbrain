@@ -54,12 +54,17 @@ EMA_ALPHA = 0.3
 # Cache file for dynamically discovered free OpenRouter models (FreeRide approach)
 OPENROUTER_FREE_CACHE_FILE  = CONFIG_DIR / "openrouter_free_models.json"
 OPENROUTER_FREE_CACHE_HOURS = 6   # re-fetch every 6 h
-OPENROUTER_API_MODELS_URL   = "https://openrouter.ai/api/v1/models"
+OPENROUTER_DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_BASE_URL = os.environ.get(
     "OPENROUTER_BASE_URL",
-    "https://openrouter.ai/api/v1",
+    OPENROUTER_DEFAULT_BASE_URL,
 ).rstrip("/")
 OPENROUTER_CHAT_COMPLETIONS_URL = f"{OPENROUTER_BASE_URL}/chat/completions"
+OPENROUTER_API_MODELS_URL = (
+    f"{OPENROUTER_DEFAULT_BASE_URL}/models"
+    if OPENROUTER_BASE_URL == OPENROUTER_DEFAULT_BASE_URL
+    else None
+)
 
 # Trusted providers — affects scoring weight for dynamic discovery (FreeRide)
 TRUSTED_PROVIDERS = [
@@ -684,6 +689,8 @@ class ModelRouter:
         api_key = self._key("OPENROUTER_API_KEY")
         if not api_key:
             return  # No key → skip
+        if not OPENROUTER_API_MODELS_URL:
+            return  # Custom gateway (e.g. OmniRoute): dynamic OpenRouter discovery disabled
 
         # Check cache freshness
         try:
