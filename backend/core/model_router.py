@@ -55,6 +55,11 @@ EMA_ALPHA = 0.3
 OPENROUTER_FREE_CACHE_FILE  = CONFIG_DIR / "openrouter_free_models.json"
 OPENROUTER_FREE_CACHE_HOURS = 6   # re-fetch every 6 h
 OPENROUTER_API_MODELS_URL   = "https://openrouter.ai/api/v1/models"
+OPENROUTER_BASE_URL = os.environ.get(
+    "OPENROUTER_BASE_URL",
+    "https://openrouter.ai/api/v1",
+).rstrip("/")
+OPENROUTER_CHAT_COMPLETIONS_URL = f"{OPENROUTER_BASE_URL}/chat/completions"
 
 # Trusted providers — affects scoring weight for dynamic discovery (FreeRide)
 TRUSTED_PROVIDERS = [
@@ -996,7 +1001,7 @@ class ModelRouter:
     def _openrouter_text(self, model_id: str, prompt: str) -> str:
         import requests
         resp = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
+            OPENROUTER_CHAT_COMPLETIONS_URL,
             headers={
                 "Authorization": f"Bearer {self._key('OPENROUTER_API_KEY')}",
                 "HTTP-Referer": "https://github.com/superbrain",
@@ -1027,7 +1032,7 @@ class ModelRouter:
             })
         content.append({"type": "text", "text": prompt})
         resp = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
+            OPENROUTER_CHAT_COMPLETIONS_URL,
             headers={
                 "Authorization": f"Bearer {self._key('OPENROUTER_API_KEY')}",
                 "HTTP-Referer": "https://github.com/superbrain",
