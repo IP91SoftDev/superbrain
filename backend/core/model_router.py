@@ -60,6 +60,10 @@ OPENROUTER_BASE_URL = os.environ.get(
     OPENROUTER_DEFAULT_BASE_URL,
 ).rstrip("/")
 OPENROUTER_CHAT_COMPLETIONS_URL = f"{OPENROUTER_BASE_URL}/chat/completions"
+OPENROUTER_MODEL_OVERRIDE = os.environ.get(
+    "OPENROUTER_MODEL_OVERRIDE",
+    "",
+).strip()
 OPENROUTER_API_MODELS_URL = (
     f"{OPENROUTER_DEFAULT_BASE_URL}/models"
     if OPENROUTER_BASE_URL == OPENROUTER_DEFAULT_BASE_URL
@@ -1016,7 +1020,7 @@ class ModelRouter:
                 "Content-Type": "application/json",
             },
             json={
-                "model": model_id,
+                "model": OPENROUTER_MODEL_OVERRIDE or model_id,
                 "messages": [{"role": "user", "content": prompt}],
                 "max_tokens": 800,
                 "temperature": 0.7,
@@ -1047,7 +1051,7 @@ class ModelRouter:
                 "Content-Type": "application/json",
             },
             json={
-                "model": model_id,
+                "model": OPENROUTER_MODEL_OVERRIDE or model_id,
                 "messages": [{"role": "user", "content": content}],
                 "max_tokens": 800,
                 "temperature": 0.7,
